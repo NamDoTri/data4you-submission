@@ -1,6 +1,5 @@
 const fs = require('fs');
 const {google} = require('googleapis');
-const screenshotmachine = require('screenshotmachine');
 const authorize = require('./authorizeDrive');
 
 module.exports = (fileName, data) => {
@@ -24,8 +23,9 @@ function uploadImage(auth,fileName, data) {
     };
     const media = {
         mimeType: "image/jpeg",
-        body: screenshotmachine.readScreenshot(data)
+        body: fs.createReadStream(data)
     };
+    
     drive.files.create({
         resource: fileMetadata,
         media: media,
@@ -34,7 +34,7 @@ function uploadImage(auth,fileName, data) {
         if(err){
             console.log(err)
         }else{
-            console.log('File ID: ', file.id)
+            console.log('1 file uploaded to Drive.')
         }
     });
 }

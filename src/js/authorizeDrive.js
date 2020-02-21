@@ -8,18 +8,21 @@ const TOKEN_PATH = 'token.json';
 module.exports = (credentials, callback) => {
     const {client_secret, client_id, redirect_uris} = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+
     fs.readFile(TOKEN_PATH, (err, token) => {
         if(err) return getAccessToken(oAuth2Client, callback);
         oAuth2Client.setCredentials(JSON.parse(token));
         callback(oAuth2Client);
     });
 }
+
 const getAccessToken = (oAuth2Client, callback) => {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES
     });
     console.log('Authorize this app by visiting this url:', authUrl);
+    
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -31,8 +34,8 @@ const getAccessToken = (oAuth2Client, callback) => {
             oAuth2Client.setCredentials(token);
             // Store the token to disk for later program executions
             fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-            if (err) return console.error(err);
-            console.log('Token stored to', TOKEN_PATH);
+                if (err) return console.error(err);
+                console.log('Token stored to', TOKEN_PATH);
             });
             callback(oAuth2Client);
         });
